@@ -100,13 +100,11 @@ vector<AnomalyReport> SimpleAnomalyDetector::detect(const TimeSeries &ts) {
         float dev_p = 0.0;
         for (int k = 0; k < data_s[cf[i].feature1].size(); k++) {
             if (cf[i].corrlation > 0.9) {
+                // Case used simple detector
                 dev_p = dev(*ps[k], cf[i].lin_reg);
             } else {
-                float distance = dist(Point(cf[i].x,cf[i].y), *ps[k]);
-                if (distance > cf[i].radius) {
-                    dev_p = dist(Point(cf[i].x, cf[i].y), *ps[k]);
-                }
-             //       cout << "dev_p: " << dev_p << " radius: " << cf[i].radius << endl;
+                // case used min circle detector
+                dev_p = dist(Point(cf[i].x, cf[i].y), *ps[k]);
             }
             // Checks whether the deviation of the current point
             // is larger than the max deviation
