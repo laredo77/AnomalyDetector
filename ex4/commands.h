@@ -57,7 +57,14 @@ public:
     }
 
     void execute() override {
+        cout << "IM IN OPTION 1##############";
+        const char* fileName = "anomalyTrain.csv";
+        TimeSeries *ts = new TimeSeries(fileName);
+
         dio->write("Please upload your local train CSV file.\n");
+        while (dio->read() != "Done") {
+            ts->add_new_line(fileName, dio->read());
+        }
     }
 };
 
@@ -72,6 +79,7 @@ public:
     }
 
     void execute() override {
+        cout << "IM IN OPTION 2###";
     }
 };
 

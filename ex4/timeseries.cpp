@@ -12,7 +12,7 @@
 #include <map>
 
 // Adding new line to the data
-void TimeSeries::add_new_line(const char *fileName, char *newLine) {
+void TimeSeries::add_new_line(const char *fileName, string newLine) {
 
     fstream fout;
     fout.open(fileName, ios::app);

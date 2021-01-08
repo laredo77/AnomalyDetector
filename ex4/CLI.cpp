@@ -29,8 +29,7 @@ void CLI::start(){
     }
 
     string input = dio->read();
-
-    //menu[input]->execute();
+    menu[input]->execute();
 }
 
 

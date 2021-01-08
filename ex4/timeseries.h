@@ -18,7 +18,7 @@ public:
         data_structure = set_data_structure(CSVfileName);
     }
 
-    void add_new_line(const char *fileName, char *newLine);
+    void add_new_line(const char *fileName, string newLine);
     map<std::string, vector<float>> get_data_structure();
     map<std::string, vector<float>> set_data_structure(const char *fileName);
     vector<string> get_features();
