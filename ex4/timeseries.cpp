@@ -16,7 +16,7 @@ void TimeSeries::add_new_line(const char *fileName, string newLine) {
 
     fstream fout;
     fout.open(fileName, ios::app);
-    fout << newLine;
+    fout << newLine << endl;
     fout.close();
 }
 // Setting data structure as a map.

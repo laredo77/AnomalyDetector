@@ -57,13 +57,21 @@ public:
     }
 
     void execute() override {
-        cout << "IM IN OPTION 1##############";
-        const char* fileName = "anomalyTrain.csv";
-        TimeSeries *ts = new TimeSeries(fileName);
 
-        dio->write("Please upload your local train CSV file.\n");
-        while (dio->read() != "Done") {
-            ts->add_new_line(fileName, dio->read());
+        const char *fileName = "anomalyTrain.csv";
+        TimeSeries *ts = new TimeSeries(fileName);
+        for (int i = 0; i < 2; i++) {
+            dio->write("Please upload your local train CSV file.\n");
+            while (true) {
+                string line = dio->read();
+                if (line == "done") {
+                    dio->write("Upload complete.\n");
+                    break;
+                } else {
+                    ts->add_new_line(fileName, line);
+                }
+            }
+            fileName = "anomalyTest.csv";
         }
     }
 };
