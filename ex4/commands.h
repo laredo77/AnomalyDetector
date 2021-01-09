@@ -27,7 +27,6 @@ class CLIData {
 public:
     TimeSeries *ts;
     HybridAnomalyDetector *hy;
-    string description;
 };
 
 
@@ -136,7 +135,7 @@ public:
 
     void execute() override {
 
-        clid->hy = new HybridAnomalyDetector();
+        //clid->hy = new HybridAnomalyDetector();
         TimeSeries ts1("anomalyTrain.csv");
         clid->hy->learnNormal(ts1);
         TimeSeries ts2("anomalyTest.csv");
@@ -157,10 +156,8 @@ public:
     }
 
     void execute() override {
-        HybridAnomalyDetector add;
-        vector<AnomalyReport> vAr = add.get_vAr();
-        //vector<AnomalyReport> vAr = hy.get_vAr();
-        for (auto & i : vAr) {
+
+        for (auto & i : this->clid->hy->get_vAr()) {
             dio->write(i.timeStep);
             dio->write("\t");
             dio->write(i.description);
@@ -173,11 +170,11 @@ public:
 class Option5: public Command {
 public:
     Option5(DefaultIO* dio, CLIData* clid) : Command(dio, clid) {
-        clid->description = "5.upload anomalies and analyze results\n";
+        this->description = "5.upload anomalies and analyze results\n";
     }
 
     string getDescription() {
-        return clid->description;
+        return this->description;
     }
 
     void execute() override {
@@ -188,11 +185,11 @@ public:
 class Option6: public Command {
 public:
     Option6(DefaultIO* dio, CLIData* clid) : Command(dio, clid) {
-        clid->description = "6.exit\n";
+        this->description = "6.exit\n";
     }
 
     string getDescription() {
-        return clid->description;
+        return this->description;
     }
 
     void execute() override {

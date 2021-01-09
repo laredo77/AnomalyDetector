@@ -13,10 +13,9 @@ class CLI {
 	CLIData* clid;
     // you can add data members
     std::map<std::string, Command*> menu;
-	string description;
 
 public:
-	CLI(DefaultIO* dio, CLIData* clid);
+	CLI(DefaultIO* dio);
 	void start();
 	virtual ~CLI();
 };

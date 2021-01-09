@@ -7,8 +7,7 @@
 #include "minCircle.h"
 
 class HybridAnomalyDetector:public SimpleAnomalyDetector {
-    vector<correlatedFeatures> cf;
-    vector<AnomalyReport> v_ar;
+
 public:
 	HybridAnomalyDetector();
 	virtual ~HybridAnomalyDetector();

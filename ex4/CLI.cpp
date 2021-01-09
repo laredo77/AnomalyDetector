@@ -1,9 +1,9 @@
 #include "CLI.h"
 
-CLI::CLI(DefaultIO* dio, CLIData* clid) {
+CLI::CLI(DefaultIO* dio) {
 
     this->dio = dio;
-    this->clid = clid;
+    this->clid = new CLIData();
 
     Command *opt1 = new Option1(dio, clid);
     Command *opt2 = new Option2(dio, clid);

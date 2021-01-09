@@ -2,8 +2,6 @@
 #include "HybridAnomalyDetector.h"
 
 HybridAnomalyDetector::HybridAnomalyDetector() {
-    cf = this->getNormalModel();
-    v_ar = this->getVar();
 }
 
 HybridAnomalyDetector::~HybridAnomalyDetector() {
@@ -11,7 +9,7 @@ HybridAnomalyDetector::~HybridAnomalyDetector() {
 }
 
 void HybridAnomalyDetector::set_threshold(float threshold) {
-    for(int i = 0; i < cf.size(); i++) {
+    for(int i = 0; i < this->cf.size(); i++) {
         this->cf[i].threshold = threshold;
     }
 }
