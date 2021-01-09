@@ -26,7 +26,7 @@ public:
 class CLIData {
 public:
     TimeSeries *ts;
-    HybridAnomalyDetector *hy;
+    HybridAnomalyDetector *hy = new HybridAnomalyDetector();
 };
 
 
@@ -58,7 +58,7 @@ public:
         this->description = "1.upload a time series csv file\n";
     }
 
-    string getDescription() {
+    string getDescription() override {
         return this->description;
     }
 
@@ -97,13 +97,13 @@ public:
         this->description = "2.algorithm settings\n";
     }
 
-    string getDescription() {
+    string getDescription() override {
         return this->description;
     }
 
     void execute() override {
-        clid->hy = new HybridAnomalyDetector();
-        //HybridAnomalyDetector hy;
+
+        //clid->hy = new HybridAnomalyDetector();
         float threshold = clid->hy->get_threshold();
 
         dio->write("The current correlation threshold is ");
@@ -117,7 +117,7 @@ public:
                 clid->hy->set_threshold(threshold);
                 break;
             } else {
-                dio->write("please choose a value between 0 and 1.");
+                dio->write("please choose a value between 0 and 1.\n");
             }
         }
     }
@@ -126,16 +126,15 @@ public:
 class Option3: public Command {
 public:
     Option3(DefaultIO* dio, CLIData* clid) : Command(dio, clid) {
-        this->description = "3.detect anomalies";
+        this->description = "3.detect anomalies\n";
     }
 
-    string getDescription() {
+    string getDescription() override {
         return this->description;
     }
 
     void execute() override {
 
-        //clid->hy = new HybridAnomalyDetector();
         TimeSeries ts1("anomalyTrain.csv");
         clid->hy->learnNormal(ts1);
         TimeSeries ts2("anomalyTest.csv");
@@ -151,13 +150,13 @@ public:
         this->description = "4.display results\n";
     }
 
-    string getDescription() {
+    string getDescription() override {
         return this->description;
     }
 
     void execute() override {
 
-        for (auto & i : this->clid->hy->get_vAr()) {
+        for (auto & i : clid->hy->get_vAr()) {
             dio->write(i.timeStep);
             dio->write("\t");
             dio->write(i.description);
@@ -173,12 +172,48 @@ public:
         this->description = "5.upload anomalies and analyze results\n";
     }
 
-    string getDescription() {
+    string getDescription() override {
         return this->description;
     }
 
     void execute() override {
 
+        vector<AnomalyReport> vAr = clid->hy->get_vAr();
+        vector<AnomalyReport> cdr;  // Common description report
+        vector<vector<AnomalyReport>> reports;
+        vector<pair<long,long>> sq; // Sequence of anomalies, start,finish
+
+
+        for (int i = 0; i < vAr.size(); i++) {
+
+            int j = i + 1;
+            cdr.push_back(vAr[i]);
+
+            while (vAr[i].description == vAr[j].description) {
+                cdr.push_back(vAr[j]);
+                j++;
+            }
+
+            long s_begin; // begining of time sequence
+            long s_end; // end of time sequence
+
+            for (int d = 0; d < cdr.size(); d++) {
+                s_begin = cdr[d].timeStep;
+
+                while (d < cdr.size() - 1) {
+                    if (cdr[d].timeStep + 1 == cdr[d + 1].timeStep)
+                        d++;
+                    break;
+                }
+                s_end = cdr[d].timeStep;
+                sq.emplace_back(s_begin, s_end);
+            }
+
+            reports.push_back(cdr);
+
+            cdr.clear();
+            i = j - 1;
+        }
     }
 };
 
@@ -188,7 +223,7 @@ public:
         this->description = "6.exit\n";
     }
 
-    string getDescription() {
+    string getDescription() override {
         return this->description;
     }
 
