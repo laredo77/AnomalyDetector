@@ -7,6 +7,7 @@
 #include <string.h>
 #include <fstream>
 #include <vector>
+#include <sstream>
 
 #include "HybridAnomalyDetector.h"
 
@@ -25,8 +26,9 @@ public:
 
 class CLIData {
 public:
-    TimeSeries *ts;
+    TimeSeries* ts;
     HybridAnomalyDetector *hy = new HybridAnomalyDetector();
+    vector<pair<string, TimeSeries>> files;
 };
 
 
@@ -73,7 +75,6 @@ public:
             remove("anomalyTest.csv");
 
         const char *fileName = "anomalyTrain.csv";
-        clid->ts = new TimeSeries(fileName);
 
         for (int i = 0; i < 2; i++) {
             dio->write("Please upload your local train CSV file.\n");
@@ -86,6 +87,9 @@ public:
                     clid->ts->add_new_line(fileName, line);
                 }
             }
+            TimeSeries times(fileName);
+            clid->ts = &times;
+            clid->files.emplace_back(fileName, *clid->ts);
             fileName = "anomalyTest.csv";
         }
     }
@@ -180,9 +184,7 @@ public:
 
         vector<AnomalyReport> vAr = clid->hy->get_vAr();
         vector<AnomalyReport> cdr;  // Common description report
-        vector<vector<AnomalyReport>> reports;
-        vector<pair<long,long>> sq; // Sequence of anomalies, start,finish
-
+        vector<pair<long,long>> sq; // Sequence of anomalies, begin,end
 
         for (int i = 0; i < vAr.size(); i++) {
 
@@ -197,23 +199,65 @@ public:
             long s_begin; // begining of time sequence
             long s_end; // end of time sequence
 
-            for (int d = 0; d < cdr.size(); d++) {
-                s_begin = cdr[d].timeStep;
+            for (int k = 0; k < cdr.size(); k++) {
+                s_begin = cdr[k].timeStep;
 
-                while (d < cdr.size() - 1) {
-                    if (cdr[d].timeStep + 1 == cdr[d + 1].timeStep)
-                        d++;
+                while (k < cdr.size() - 1) {
+                    if (cdr[k].timeStep + 1 == cdr[k + 1].timeStep) {
+                        k++;
+                        continue;
+                    }
                     break;
                 }
-                s_end = cdr[d].timeStep;
-                sq.emplace_back(s_begin, s_end);
+                if (cdr.size() > 1) {
+                    if (cdr[k].timeStep == cdr[k - 1].timeStep + 1) {
+                        s_end = cdr[k].timeStep;
+                        sq.emplace_back(s_begin, s_end);
+                    } else {
+                        s_end = cdr[k].timeStep;
+                        sq.emplace_back(s_begin, s_end);
+                    }
+                } else {
+                    sq.emplace_back(s_begin, s_begin);
+                }
             }
-
-            reports.push_back(cdr);
-
             cdr.clear();
             i = j - 1;
         }
+
+        vector<pair<long,long>> u_sq; // user sequence of anomalies
+        long f,s;                   // first second
+        string first, second;
+        int pos;
+
+        while (true) {
+            string line = dio->read();
+            if (line == "done") {
+                dio->write("Upload complete.\n");
+                break;
+            } else {
+                pos = line.find_first_of(',');
+                first = line.substr(0, pos);
+                second = line.substr(pos + 1);
+                f = std::stol(first);
+                s = std::stol(second);
+                u_sq.emplace_back(f,s);
+            }
+        }
+
+        float P = u_sq.size();
+        int sum = 0;
+        for (auto & i : u_sq) {
+            sum += (i.second - i.first);
+        }
+
+//        ptrdiff_t pos2 = find(clid->files.begin()->first,
+//                              clid->files.end()->first, old_name_)
+//                                      - clid->files.begin()->first;
+        int n = clid->files[0].second.file_size() - 1;
+        float N = n - sum;
+        sort(sq.begin(), sq.end());
+        cout << "G";
     }
 };
 

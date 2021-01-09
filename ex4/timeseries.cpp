@@ -61,3 +61,16 @@ map<std::string, vector<float>> TimeSeries::get_data_structure() {
 vector<string> TimeSeries::get_features() {
     return this->features;
 }
+
+int TimeSeries::file_size() {
+
+    int number_of_lines = 0;
+    FILE *infile = fopen(m_fileName, "r");
+    int ch;
+
+    while (EOF != (ch=getc(infile))) {
+        if ('\n' == ch)
+            ++number_of_lines;
+    }
+    return number_of_lines;
+}

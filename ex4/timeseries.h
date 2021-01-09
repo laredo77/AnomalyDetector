@@ -22,5 +22,6 @@ public:
     map<std::string, vector<float>> get_data_structure();
     map<std::string, vector<float>> set_data_structure(const char *fileName);
     vector<string> get_features();
+    int file_size();
 };
 #endif /* TIMESERIES_H_ */
