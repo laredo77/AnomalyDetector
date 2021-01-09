@@ -79,8 +79,9 @@ void check(string outputFile,string expectedOutputFile){
 
  //small test
 int main(){
+    CLIData clid;
 	STDtest std("input.txt","output.txt");
-	CLI cli(&std);
+	CLI cli(&std, &clid);
 	cli.start();
 	std.close();
 //	check("output.txt","expectedOutput.txt");

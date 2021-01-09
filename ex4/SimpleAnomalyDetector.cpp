@@ -88,7 +88,7 @@ vector<AnomalyReport> SimpleAnomalyDetector::detect(const TimeSeries &ts) {
     // TODO Auto-generated destructor stub
     TimeSeries time_series = ts;
     map<std::string, vector<float>> data_s = time_series.get_data_structure();
-    vector<AnomalyReport> v_ar;
+    //vector<AnomalyReport> v_ar;
 
     for (int i = 0; i < cf.size(); i++) {
         Point *ps[data_s[cf[i].feature1].size()];
@@ -112,7 +112,7 @@ vector<AnomalyReport> SimpleAnomalyDetector::detect(const TimeSeries &ts) {
                 // If so, reported as anomaly!
                 string desc = cf[i].feature1 + "-" + cf[i].feature2;
                 AnomalyReport aReport = AnomalyReport(desc, (k + 1));
-                v_ar.push_back(aReport);
+                this->v_ar.push_back(aReport);
             }
         }
         // Deleting points
@@ -120,5 +120,5 @@ vector<AnomalyReport> SimpleAnomalyDetector::detect(const TimeSeries &ts) {
             delete ps[m];
         }
     }
-    return v_ar;
+    return this->v_ar;
 }

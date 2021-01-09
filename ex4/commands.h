@@ -5,9 +5,9 @@
 
 #include<iostream>
 #include <string.h>
-
 #include <fstream>
 #include <vector>
+
 #include "HybridAnomalyDetector.h"
 
 using namespace std;
@@ -23,17 +23,23 @@ public:
 	// you may add additional methods here
 };
 
-// you may add here helper classes
+class CLIData {
+public:
+    TimeSeries *ts;
+    HybridAnomalyDetector *hy;
+    string description;
+};
 
 
 // you may edit this class
 class Command {
 protected:
 	DefaultIO* dio;
-	string description;
+	CLIData* clid;
+    string description;
+
 public:
-	//Command(DefaultIO* dio, string description):dio(dio), description(description){}
-	Command(DefaultIO* dio):dio(dio){}
+	Command(DefaultIO* dio, CLIData* clid):dio(dio), clid(clid){}
 	virtual void execute()=0;
 	virtual ~Command(){}
 	virtual string getDescription()=0;
@@ -41,6 +47,7 @@ public:
 
 
 // implement here your command classes
+
 //class UploadCommand: public Command {
 //public://
 //    UploadCommand(DefaultIO *dio, Clidata *clidata) : Command(dio, clidata)
@@ -48,7 +55,7 @@ public:
 
 class Option1: public Command {
 public:
-    Option1(DefaultIO *dio) : Command(dio) {
+    Option1(DefaultIO* dio, CLIData* clid) : Command(dio, clid) {
         this->description = "1.upload a time series csv file\n";
     }
 
@@ -58,8 +65,17 @@ public:
 
     void execute() override {
 
+        std::ifstream infile("anomalyTrain.csv");
+        if (infile.good())
+            remove("anomalyTrain.csv");
+
+        std::ifstream infile2("anomalyTest.csv");
+        if (infile2.good())
+            remove("anomalyTest.csv");
+
         const char *fileName = "anomalyTrain.csv";
-        TimeSeries *ts = new TimeSeries(fileName);
+        clid->ts = new TimeSeries(fileName);
+
         for (int i = 0; i < 2; i++) {
             dio->write("Please upload your local train CSV file.\n");
             while (true) {
@@ -68,7 +84,7 @@ public:
                     dio->write("Upload complete.\n");
                     break;
                 } else {
-                    ts->add_new_line(fileName, line);
+                    clid->ts->add_new_line(fileName, line);
                 }
             }
             fileName = "anomalyTest.csv";
@@ -78,7 +94,7 @@ public:
 
 class Option2: public Command {
 public:
-    Option2(DefaultIO *dio) : Command(dio) {
+    Option2(DefaultIO* dio, CLIData* clid) : Command(dio, clid) {
         this->description = "2.algorithm settings\n";
     }
 
@@ -87,14 +103,31 @@ public:
     }
 
     void execute() override {
-        cout << "IM IN OPTION 2###";
+        clid->hy = new HybridAnomalyDetector();
+        //HybridAnomalyDetector hy;
+        float threshold = clid->hy->get_threshold();
+
+        dio->write("The current correlation threshold is ");
+        dio->write(threshold);
+        dio->write("\nType a new threshold\n");
+
+        while (true) {
+            string line = dio->read();
+            threshold = std::stof(line);
+            if (threshold >= 0 && threshold <= 1) {
+                clid->hy->set_threshold(threshold);
+                break;
+            } else {
+                dio->write("please choose a value between 0 and 1.");
+            }
+        }
     }
 };
 
 class Option3: public Command {
 public:
-    Option3(DefaultIO *dio) : Command(dio) {
-        this->description = "3.detect anomalies\n";
+    Option3(DefaultIO* dio, CLIData* clid) : Command(dio, clid) {
+        this->description = "3.detect anomalies";
     }
 
     string getDescription() {
@@ -103,12 +136,19 @@ public:
 
     void execute() override {
 
+        clid->hy = new HybridAnomalyDetector();
+        TimeSeries ts1("anomalyTrain.csv");
+        clid->hy->learnNormal(ts1);
+        TimeSeries ts2("anomalyTest.csv");
+        clid->hy->detect(ts2);
+
+        dio->write("anomaly detection complete.\n");
     }
 };
 
 class Option4: public Command {
 public:
-    Option4(DefaultIO *dio) : Command(dio) {
+    Option4(DefaultIO* dio, CLIData* clid) : Command(dio, clid) {
         this->description = "4.display results\n";
     }
 
@@ -117,18 +157,27 @@ public:
     }
 
     void execute() override {
-
+        HybridAnomalyDetector add;
+        vector<AnomalyReport> vAr = add.get_vAr();
+        //vector<AnomalyReport> vAr = hy.get_vAr();
+        for (auto & i : vAr) {
+            dio->write(i.timeStep);
+            dio->write("\t");
+            dio->write(i.description);
+            dio->write("\n");
+        }
+        dio->write("Done.\n");
     }
 };
 
 class Option5: public Command {
 public:
-    Option5(DefaultIO *dio) : Command(dio) {
-        this->description = "5.upload anomalies and analyze results\n";
+    Option5(DefaultIO* dio, CLIData* clid) : Command(dio, clid) {
+        clid->description = "5.upload anomalies and analyze results\n";
     }
 
     string getDescription() {
-        return this->description;
+        return clid->description;
     }
 
     void execute() override {
@@ -138,12 +187,12 @@ public:
 
 class Option6: public Command {
 public:
-    Option6(DefaultIO *dio) : Command(dio) {
-        this->description = "6.exit\n";
+    Option6(DefaultIO* dio, CLIData* clid) : Command(dio, clid) {
+        clid->description = "6.exit\n";
     }
 
     string getDescription() {
-        return this->description;
+        return clid->description;
     }
 
     void execute() override {
