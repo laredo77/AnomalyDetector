@@ -254,10 +254,54 @@ public:
 //        ptrdiff_t pos2 = find(clid->files.begin()->first,
 //                              clid->files.end()->first, old_name_)
 //                                      - clid->files.begin()->first;
-        int n = clid->files[0].second.file_size() - 1;
+        int n = clid->files[0].second.file_size() - 1;  // files[0] not currect!!!!!
         float N = n - sum;
         sort(sq.begin(), sq.end());
-        cout << "G";
+        float TP = 0, FP = 0;
+
+        for (auto & i : u_sq) {
+            for (auto & j : sq) {
+                if (i.second >= j.second) {
+                    if (i.first >= j.first) {
+                        if ((i.second - i.first) + (j.second - j.first) >=
+                            i.second - j.first) {
+                            TP++;
+                        } else {
+                            FP++;
+                        }
+                    } else {
+                        TP++;
+                    }
+                } else {
+                    if (i.first >= j.first) {
+                        TP++;
+                    } else {
+                        if ((i.second - i.first) + (j.second - j.first) >=
+                         j.second - i.first) {
+                            TP++;
+                        } else {
+                            FP++;
+                        }
+                    }
+                }
+            }
+        }
+
+        float tpr = (TP / P); // True Positive Rate
+        tpr = tpr * 1000;
+        tpr = floor(tpr);
+        tpr = tpr / 1000;
+
+        float fpr = (FP / N); // False Positive Rate
+        fpr = fpr * 1000;
+        fpr = floor(fpr);
+        fpr = fpr / 1000;
+
+        dio->write("True Positive Rate: ");
+        dio->write((tpr));
+        dio->write("\nFalse Positive Rate: ");
+        dio->write((fpr));
+        dio->write("\n");
     }
 };
 
