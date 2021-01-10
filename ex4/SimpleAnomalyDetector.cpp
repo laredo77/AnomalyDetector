@@ -3,12 +3,10 @@
  *
  * Author: 311547087, Itamar Laredo
  */
-#include <iostream>
 #include <vector>
 #include "AnomalyDetector.h"
 #include "SimpleAnomalyDetector.h"
-#include "minCircle.h"
-#include <sstream>
+
 
 // Constructor
 SimpleAnomalyDetector::SimpleAnomalyDetector() {
@@ -48,9 +46,9 @@ void SimpleAnomalyDetector::learnNormal(const TimeSeries &ts) {
                 cfs.x = 0;
                 cfs.y = 0;
                 cfs.radius = 0;
-                // Focuses on correlations higher than 0.9
+                // focus on correlations higher than 0.9
                 if (correlation > 0.9) {
-                    // Calculates the max deviation
+                    // calculate the max deviation
                     float max_dev = 0.0;
                     for (int l = 0; l < data_s[time_series.get_features()[i]].size(); l++) {
                         if (max_dev < dev(*ps[l], lin_reg)) {
@@ -67,14 +65,14 @@ void SimpleAnomalyDetector::learnNormal(const TimeSeries &ts) {
                     cfs.y = c.center.y;
                     cfs.radius = c.radius;
                 }
-                // Initialize the rest of the correlationFeatures struct
+                // initialize the rest of the correlationFeatures struct
                 cfs.feature1 = time_series.get_features()[i];
                 cfs.feature2 = time_series.get_features()[j];
                 cfs.corrlation = correlation;
                 cfs.lin_reg = lin_reg;
                 cf.push_back(cfs);
 
-                // Deleting points
+                // deleting points
                 for (int m = 0; m < data_s[time_series.get_features()[i]].size(); m++) {
                     delete ps[m];
                 }
@@ -88,7 +86,6 @@ vector<AnomalyReport> SimpleAnomalyDetector::detect(const TimeSeries &ts) {
     // TODO Auto-generated destructor stub
     TimeSeries time_series = ts;
     map<std::string, vector<float>> data_s = time_series.get_data_structure();
-    //vector<AnomalyReport> v_ar;
 
     for (int i = 0; i < cf.size(); i++) {
         Point *ps[data_s[cf[i].feature1].size()];
@@ -96,26 +93,26 @@ vector<AnomalyReport> SimpleAnomalyDetector::detect(const TimeSeries &ts) {
             ps[j] = new Point(data_s[cf[i].feature1][j], data_s[cf[i].feature2][j]);
         }
 
-        // Checks deviation to each point
+        // check deviation to each point
         float dev_p = 0.0;
         for (int k = 0; k < data_s[cf[i].feature1].size(); k++) {
             if (cf[i].corrlation > 0.9) {
-                // Case used simple detector
+                // case used simple detector
                 dev_p = dev(*ps[k], cf[i].lin_reg);
             } else {
                 // case used min circle detector
                 dev_p = dist(Point(cf[i].x, cf[i].y), *ps[k]);
             }
-            // Checks whether the deviation of the current point
+            // check whether the deviation of the current point
             // is larger than the max deviation
             if (dev_p > cf[i].threshold) {
-                // If so, reported as anomaly!
+                // if so, reported as anomaly!
                 string desc = cf[i].feature1 + "-" + cf[i].feature2;
                 AnomalyReport aReport = AnomalyReport(desc, (k + 1));
                 this->v_ar.push_back(aReport);
             }
         }
-        // Deleting points
+        // delete points
         for (int m = 0; m < data_s[time_series.get_features()[i]].size(); m++) {
             delete ps[m];
         }

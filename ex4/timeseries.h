@@ -1,3 +1,8 @@
+/*
+ * timeseries.h
+ *
+ * Author: 311547087, Itamar Laredo
+ */
 #ifndef TIMESERIES_H_
 #define TIMESERIES_H_
 

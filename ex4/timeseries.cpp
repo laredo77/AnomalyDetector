@@ -11,7 +11,7 @@
 #include <vector>
 #include <map>
 
-// Adding new line to the data
+// Adding new line to file
 void TimeSeries::add_new_line(const char *fileName, string newLine) {
 
     fstream fout;
@@ -19,15 +19,13 @@ void TimeSeries::add_new_line(const char *fileName, string newLine) {
     fout << newLine << endl;
     fout.close();
 }
-// Setting data structure as a map.
+// Set data structure as a map.
 // The keys hold the features and the elements is vector of float numbers
 map<std::string, vector<float>> TimeSeries::set_data_structure(const char *fileName) {
 
-    // File pointer
-    fstream fin;
+    fstream fin; // file pointer
     std::map<std::string, vector<float> > data_s;
-    // Open an existing file
-    fin.open(fileName, ios::in);
+    fin.open(fileName, ios::in); // open an existing file
     std::string line, line2;
     // Adding features as key and initialize vector as value
     for (int i = 0; i < 1; i++) {
@@ -61,15 +59,15 @@ map<std::string, vector<float>> TimeSeries::get_data_structure() {
 vector<string> TimeSeries::get_features() {
     return this->features;
 }
-
+// Getter to the size of the file (numbers of lines)
 int TimeSeries::file_size() {
 
     int number_of_lines = 0;
     FILE *infile = fopen(m_fileName, "r");
-    int ch;
-
-    while (EOF != (ch=getc(infile))) {
-        if ('\n' == ch)
+    int k;
+    // count lines until end of file
+    while (EOF != (k=getc(infile))) {
+        if ('\n' == k)
             ++number_of_lines;
     }
     return number_of_lines;

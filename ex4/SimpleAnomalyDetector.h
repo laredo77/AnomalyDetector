@@ -1,3 +1,8 @@
+/*
+ * SimpleAnomalyDetector.h
+ *
+ * Author: 311547087, Itamar Laredo
+ */
 #ifndef SIMPLEANOMALYDETECTOR_H_
 #define SIMPLEANOMALYDETECTOR_H_
 
@@ -30,10 +35,11 @@ public:
     virtual void learnNormal(const TimeSeries &ts);
     virtual vector<AnomalyReport> detect(const TimeSeries &ts);
 
+    // correlated features getter
     vector<correlatedFeatures> getNormalModel() {
         return cf;
     }
-
+    // anomaly reports getter
     vector<AnomalyReport> getVar() {
         return v_ar;
     }

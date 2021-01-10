@@ -1,16 +1,24 @@
+/*
+ * CLI.cpp
+ *
+ * Author: 311547087, Itamar Laredo
+ */
 #include "CLI.h"
 
+/*
+ * CLI constructor. initialize menu options, dio and clidata.
+ */
 CLI::CLI(DefaultIO* dio) {
 
     this->dio = dio;
     this->clid = new CLIData();
 
-    Command *opt1 = new Option1(dio, clid);
-    Command *opt2 = new Option2(dio, clid);
-    Command *opt3 = new Option3(dio, clid);
-    Command *opt4 = new Option4(dio, clid);
-    Command *opt5 = new Option5(dio, clid);
-    Command *opt6 = new Option6(dio, clid);
+    Command *opt1 = new UploadCommand(dio, clid);
+    Command *opt2 = new ThresholdCommand(dio, clid);
+    Command *opt3 = new AnomalyDetectionCommand(dio, clid);
+    Command *opt4 = new ReportCommand(dio, clid);
+    Command *opt5 = new AnalyzeResultsCommand(dio, clid);
+    Command *opt6 = new ExitCommand(dio, clid);
 
     this->menu.insert({"1", opt1});
     this->menu.insert({"2", opt2});
@@ -21,6 +29,9 @@ CLI::CLI(DefaultIO* dio) {
 
 }
 
+/*
+ * run the menu for the user.
+ */
 void CLI::start() {
 
     dio->write("Welcome to the Anomaly Detection Server.\n");
@@ -39,7 +50,6 @@ void CLI::start() {
         this->start();
     }
 }
-
 
 CLI::~CLI() {
 }

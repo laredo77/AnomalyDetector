@@ -1,17 +1,18 @@
-
+/*
+ * minCircle.h
+ *
+ * Author: 311547087, Itamar Laredo
+ */
 #ifndef MINCIRCLE_H_
 #define MINCIRCLE_H_
 
 #include <iostream>
 #include <vector>
-#include <stdlib.h>     /* srand, rand */
-#include <time.h>       /* time */
+#include <stdlib.h>
+#include <time.h>
 #include "anomaly_detection_util.h"
 
 using namespace std;
-
-
-// ------------ DO NOT CHANGE -----------
 
 class Circle{
 public:
@@ -19,9 +20,6 @@ public:
     float radius;
     Circle(Point c,float r):center(c),radius(r){}
 };
-// --------------------------------------
-
-
 
 float dist(Point a, Point b);
 

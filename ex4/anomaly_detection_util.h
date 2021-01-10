@@ -1,4 +1,8 @@
-
+/*
+ * animaly_detection_util.h
+ *
+ * Author: 311547087, Itamar Laredo
+ */
 #ifndef ANOMALYDETECTORUTIL_H_
 #define ANOMALYDETECTORUTIL_H_
 

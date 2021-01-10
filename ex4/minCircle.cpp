@@ -1,9 +1,12 @@
-// 311547087, Itamar Laredo
+/*
+ * minCircle.cpp
+ *
+ * Author: 311547087, Itamar Laredo
+ */
 #include "minCircle.h"
 #include <math.h>
 #include <vector>
 using namespace std;
-
 
 /*
  * A function that returns the distance between two given points
@@ -71,6 +74,9 @@ Circle from3Points(Point a, Point b, Point c) {
     return {{center_x, center_y}, radius};
 }
 
+/*
+ * return circle center from two points
+ */
 Point circumcenter(Point b, Point c) {
     float B = b.x * b.x + b.y * b.y;
     float C = c.x * c.x + c.y * c.y;
@@ -111,7 +117,7 @@ Circle trivial(vector<Point>& P) {
  * to this function with smaller input (without the last point in the array).
  */
 Circle welzl(Point** P,vector<Point> R, size_t n) {
-    // Stop condition
+    // stop condition
     if (R.size() == 3 || n == 0) {
         return trivial(R);
     }

@@ -1,5 +1,8 @@
-
-
+/*
+ * commands.h
+ *
+ * Author: 311547087, Itamar Laredo
+ */
 #ifndef COMMANDS_H_
 #define COMMANDS_H_
 
@@ -8,11 +11,13 @@
 #include <fstream>
 #include <vector>
 #include <sstream>
-
 #include "HybridAnomalyDetector.h"
 
 using namespace std;
 
+/*
+ * input/output class. could be standardIO or socketIO
+ */
 class DefaultIO{
 public:
 	virtual string read()=0;
@@ -24,6 +29,11 @@ public:
 	// you may add additional methods here
 };
 
+/*
+ * CLI Data connect between all the commands.
+ * the Cli data saves commands data and each command gets
+ * the Cli data as argument and can use it.
+ */
 class CLIData {
 public:
     TimeSeries* ts;
@@ -31,6 +41,9 @@ public:
     vector<pair<string, TimeSeries>> files;
 };
 
+/*
+ * Commands class.
+ */
 
 // you may edit this class
 class Command {
@@ -46,17 +59,12 @@ public:
 	virtual string getDescription()=0;
 };
 
-
-// implement here your command classes
-
-//class UploadCommand: public Command {
-//public://
-//    UploadCommand(DefaultIO *dio, Clidata *clidata) : Command(dio, clidata)
-//};
-
-class Option1: public Command {
+/*
+ * Upload command class. user use it to upload files.
+ */
+class UploadCommand: public Command {
 public:
-    Option1(DefaultIO* dio, CLIData* clid) : Command(dio, clid) {
+    UploadCommand(DefaultIO* dio, CLIData* clid) : Command(dio, clid) {
         this->description = "1.upload a time series csv file\n";
     }
 
@@ -65,7 +73,7 @@ public:
     }
 
     void execute() override {
-
+        // if the file exists, remove it
         std::ifstream infile("anomalyTrain.csv");
         if (infile.good())
             remove("anomalyTrain.csv");
@@ -75,14 +83,13 @@ public:
             remove("anomalyTest.csv");
 
         const char *fileName = "anomalyTrain.csv";
-
+        // repeat the process twice: for train and test files.
         for (int i = 0; i < 2; i++) {
-
             if (i == 0)
                 dio->write("Please upload your local train CSV file.\n");
             else
                 dio->write("Please upload your local test CSV file.\n");
-
+            // upload line by line to new file
             while (true) {
                 string line = dio->read();
                 if (line == "done") {
@@ -92,6 +99,7 @@ public:
                     clid->ts->add_new_line(fileName, line);
                 }
             }
+            // save the data at cli data as timeseries object
             TimeSeries times(fileName);
             clid->ts = &times;
             clid->files.emplace_back(fileName, *clid->ts);
@@ -100,9 +108,13 @@ public:
     }
 };
 
-class Option2: public Command {
+/*
+ * Threshold command class, user gets the current threshold and
+ * can modify it with values between 0 to 1.
+ */
+class ThresholdCommand: public Command {
 public:
-    Option2(DefaultIO* dio, CLIData* clid) : Command(dio, clid) {
+    ThresholdCommand(DefaultIO* dio, CLIData* clid) : Command(dio, clid) {
         this->description = "2.algorithm settings\n";
     }
 
@@ -111,14 +123,13 @@ public:
     }
 
     void execute() override {
-
-        //clid->hy = new HybridAnomalyDetector();
+        // get current threshold
         float threshold = clid->hy->get_threshold();
 
         dio->write("The current correlation threshold is ");
         dio->write(threshold);
         dio->write("\nType a new threshold\n");
-
+        // user may change the threshold.
         while (true) {
             string line = dio->read();
             threshold = std::stof(line);
@@ -132,9 +143,13 @@ public:
     }
 };
 
-class Option3: public Command {
+/*
+ * Anomaly Detection command class. use the hybrid detector
+ * to report the anomalies.
+ */
+class AnomalyDetectionCommand: public Command {
 public:
-    Option3(DefaultIO* dio, CLIData* clid) : Command(dio, clid) {
+    AnomalyDetectionCommand(DefaultIO* dio, CLIData* clid) : Command(dio, clid) {
         this->description = "3.detect anomalies\n";
     }
 
@@ -153,9 +168,13 @@ public:
     }
 };
 
-class Option4: public Command {
+/*
+ * Report command class.
+ * display to the user the hybrid detector results.
+ */
+class ReportCommand: public Command {
 public:
-    Option4(DefaultIO* dio, CLIData* clid) : Command(dio, clid) {
+    ReportCommand(DefaultIO* dio, CLIData* clid) : Command(dio, clid) {
         this->description = "4.display results\n";
     }
 
@@ -175,9 +194,13 @@ public:
     }
 };
 
-class Option5: public Command {
+/*
+ * Analyze results and compare the hybrid detector data with
+ * the user alarms data.
+ */
+class AnalyzeResultsCommand: public Command {
 public:
-    Option5(DefaultIO* dio, CLIData* clid) : Command(dio, clid) {
+    AnalyzeResultsCommand(DefaultIO* dio, CLIData* clid) : Command(dio, clid) {
         this->description = "5.upload anomalies and analyze results\n";
     }
 
@@ -186,11 +209,13 @@ public:
     }
 
     void execute() override {
+
         dio->write("Please upload your local anomalies file.\n");
         vector<AnomalyReport> vAr = clid->hy->get_vAr();
         vector<AnomalyReport> cdr;  // Common description report
         vector<pair<long,long>> sq; // Sequence of anomalies, begin,end
 
+        // sq gets anomalies with same description and sequence of time.
         for (int i = 0; i < vAr.size(); i++) {
 
             int j = i + 1;
@@ -201,12 +226,12 @@ public:
                 j++;
             }
 
-            long s_begin; // begining of time sequence
-            long s_end; // end of time sequence
+            long s_begin; // begin of time sequence
+            long s_end;   // end of time sequence
 
             for (int k = 0; k < cdr.size(); k++) {
-                s_begin = cdr[k].timeStep;
 
+                s_begin = cdr[k].timeStep;
                 while (k < cdr.size() - 1) {
                     if (cdr[k].timeStep + 1 == cdr[k + 1].timeStep) {
                         k++;
@@ -231,10 +256,11 @@ public:
         }
 
         vector<pair<long,long>> u_sq; // user sequence of anomalies
-        long f,s;                   // first second
+        long f,s;                     // first second
         string first, second;
         int pos;
 
+        // gets from the user anomaly file
         while (true) {
             string line = dio->read();
             if (line == "done") {
@@ -250,20 +276,19 @@ public:
             }
         }
 
-        float P = u_sq.size();
-        int sum = 0;
+        float P = u_sq.size();  // Positive
+        int sum = 0;            // sum the time user had alarms
         for (auto & i : u_sq) {
             sum += (i.second - i.first) + 1;
         }
 
-//        ptrdiff_t pos2 = find(clid->files.begin()->first,
-//                              clid->files.end()->first, old_name_)
-//                                      - clid->files.begin()->first;
-        int n = clid->files[0].second.file_size() - 1;  // files[0] not currect!!!!!
-        float N = n - sum;
-        sort(sq.begin(), sq.end());
-        float TP = 0, FP = 0;
+        int n = clid->files[1].second.file_size() - 1; // total lines in data file
+        float N = n - sum;           // Negative
+        sort(sq.begin(), sq.end());  // sorting sq vector
+        float TP = 0, FP;            // True positive, False positive results.
 
+        // Checks whether there was an overlap between the reports
+        // received from the user and the actual anomalies
         for (auto & user : u_sq) {
             for (auto & machine : sq) {
                 if (machine.first <= user.first) {
@@ -281,7 +306,8 @@ public:
                 }
             }
         }
-        FP = sq.size() - TP;
+        FP = sq.size() - TP;  // False positive is the size of sq minus the true positive
+
         float tpr = (TP / P); // True Positive Rate
         tpr = tpr * 1000;
         tpr = floor(tpr);
@@ -300,9 +326,13 @@ public:
     }
 };
 
-class Option6: public Command {
+/*
+ * Exit command class. finish the connection between
+ * user to server.
+ */
+class ExitCommand: public Command {
 public:
-    Option6(DefaultIO* dio, CLIData* clid) : Command(dio, clid) {
+    ExitCommand(DefaultIO* dio, CLIData* clid) : Command(dio, clid) {
         this->description = "6.exit\n";
     }
 
@@ -313,6 +343,5 @@ public:
     void execute() override {
     }
 };
-
 
 #endif /* COMMANDS_H_ */

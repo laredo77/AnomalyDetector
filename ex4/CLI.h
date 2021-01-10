@@ -1,5 +1,8 @@
-
-
+/*
+ * CLI.h
+ *
+ * Author: 311547087, Itamar Laredo
+ */
 #ifndef CLI_H_
 #define CLI_H_
 
@@ -8,6 +11,9 @@
 
 using namespace std;
 
+/*
+ * Command Line Interface class.
+ */
 class CLI {
 	DefaultIO* dio;
 	CLIData* clid;
