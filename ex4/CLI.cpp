@@ -33,7 +33,7 @@ void CLI::start() {
     string input = dio->read();
     menu[input]->execute();
 
-    if (input == "5") {
+    if (input == "6") {
         return;
     } else {
         this->start();

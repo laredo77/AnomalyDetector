@@ -77,7 +77,12 @@ public:
         const char *fileName = "anomalyTrain.csv";
 
         for (int i = 0; i < 2; i++) {
-            dio->write("Please upload your local train CSV file.\n");
+
+            if (i == 0)
+                dio->write("Please upload your local train CSV file.\n");
+            else
+                dio->write("Please upload your local test CSV file.\n");
+
             while (true) {
                 string line = dio->read();
                 if (line == "done") {
@@ -181,7 +186,7 @@ public:
     }
 
     void execute() override {
-
+        dio->write("Please upload your local anomalies file.\n");
         vector<AnomalyReport> vAr = clid->hy->get_vAr();
         vector<AnomalyReport> cdr;  // Common description report
         vector<pair<long,long>> sq; // Sequence of anomalies, begin,end
@@ -248,7 +253,7 @@ public:
         float P = u_sq.size();
         int sum = 0;
         for (auto & i : u_sq) {
-            sum += (i.second - i.first);
+            sum += (i.second - i.first) + 1;
         }
 
 //        ptrdiff_t pos2 = find(clid->files.begin()->first,
@@ -259,34 +264,24 @@ public:
         sort(sq.begin(), sq.end());
         float TP = 0, FP = 0;
 
-        for (auto & i : u_sq) {
-            for (auto & j : sq) {
-                if (i.second >= j.second) {
-                    if (i.first >= j.first) {
-                        if ((i.second - i.first) + (j.second - j.first) >=
-                            i.second - j.first) {
-                            TP++;
-                        } else {
-                            FP++;
-                        }
-                    } else {
+        for (auto & user : u_sq) {
+            for (auto & machine : sq) {
+                if (machine.first <= user.first) {
+                    if (machine.second >= user.second)
                         TP++;
-                    }
+                    else if ((machine.second - machine.first) + (user.second - user.first)
+                    >= (user.second - machine.first))
+                        TP++;
                 } else {
-                    if (i.first >= j.first) {
+                    if (user.second >= machine.second)
                         TP++;
-                    } else {
-                        if ((i.second - i.first) + (j.second - j.first) >=
-                         j.second - i.first) {
-                            TP++;
-                        } else {
-                            FP++;
-                        }
-                    }
+                    else if ((user.second - user.first) + (machine.second - machine.first)
+                    >= (machine.second - user.first))
+                        TP++;
                 }
             }
         }
-
+        FP = sq.size() - TP;
         float tpr = (TP / P); // True Positive Rate
         tpr = tpr * 1000;
         tpr = floor(tpr);
@@ -316,7 +311,6 @@ public:
     }
 
     void execute() override {
-
     }
 };
 
