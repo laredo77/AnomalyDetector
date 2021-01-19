@@ -17,7 +17,6 @@ using namespace std;
 class CLI {
 	DefaultIO* dio;
 	CLIData* clid;
-    // you can add data members
     std::map<std::string, Command*> menu;
 
 public:

@@ -12,13 +12,14 @@
 #include <vector>
 #include <sstream>
 #include "HybridAnomalyDetector.h"
+#include <sys/socket.h>
 
 using namespace std;
 
 /*
  * input/output class. could be standardIO or socketIO
  */
-class DefaultIO{
+class DefaultIO {
 public:
 	virtual string read()=0;
 	virtual void write(string text)=0;
@@ -26,7 +27,6 @@ public:
 	virtual void read(float* f)=0;
 	virtual ~DefaultIO(){}
 
-	// you may add additional methods here
 };
 
 /*
@@ -320,7 +320,8 @@ public:
 
         dio->write("True Positive Rate: ");
         dio->write((tpr));
-        dio->write("\nFalse Positive Rate: ");
+        dio->write("\n");
+        dio->write("False Positive Rate: ");
         dio->write((fpr));
         dio->write("\n");
     }
