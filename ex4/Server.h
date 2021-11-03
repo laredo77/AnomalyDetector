@@ -1,7 +1,7 @@
 /*
  * Server.h
  *
- * Author: 311547087, Itamar Laredo
+ * Author: Itamar Laredo
  */
 
 #ifndef SERVER_H_
