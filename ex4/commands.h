@@ -1,7 +1,7 @@
 /*
  * commands.h
  *
- * Author: 311547087, Itamar Laredo
+ * Author: Itamar Laredo
  */
 #ifndef COMMANDS_H_
 #define COMMANDS_H_
