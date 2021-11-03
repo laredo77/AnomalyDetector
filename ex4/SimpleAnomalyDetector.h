@@ -1,7 +1,7 @@
 /*
  * SimpleAnomalyDetector.h
  *
- * Author: 311547087, Itamar Laredo
+ * Author: Itamar Laredo
  */
 #ifndef SIMPLEANOMALYDETECTOR_H_
 #define SIMPLEANOMALYDETECTOR_H_
