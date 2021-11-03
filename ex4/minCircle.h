@@ -1,7 +1,7 @@
 /*
  * minCircle.h
  *
- * Author: 311547087, Itamar Laredo
+ * Author: Itamar Laredo
  */
 #ifndef MINCIRCLE_H_
 #define MINCIRCLE_H_
