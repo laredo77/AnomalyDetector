@@ -1,7 +1,7 @@
 /*
  * CLI.h
  *
- * Author: 311547087, Itamar Laredo
+ * Author: Itamar Laredo
  */
 #ifndef CLI_H_
 #define CLI_H_
