@@ -1,7 +1,7 @@
 /*
  * minCircle.cpp
  *
- * Author: 311547087, Itamar Laredo
+ * Author: Itamar Laredo
  */
 #include "minCircle.h"
 #include <math.h>
