@@ -1,7 +1,7 @@
 /*
  * HybridAnomalyDetector.h
  *
- * Author: 311547087, Itamar Laredo
+ * Author: Itamar Laredo
  */
 #ifndef HYBRIDANOMALYDETECTOR_H_
 #define HYBRIDANOMALYDETECTOR_H_
